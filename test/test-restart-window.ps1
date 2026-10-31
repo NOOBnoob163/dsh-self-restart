@@ -271,7 +271,7 @@ Check '★ 全程**没有**一次"未响应"（修好"鼠标放上去转圈"）'
 Check '★ 宿主睡觉期间窗口**一直应答**（跨进程探测）' ($answered.Count -ge 5) ("应答 $($answered.Count) / 探 $($probed.Count)")
 
 # 摆位：窗口必须落在屏幕内（150% 缩放踩过"算到屏幕外"）
-$metaRaw = if (Test-Path $p1.Meta) { (Get-Content -LiteralPath $p1.Meta -Raw -Encoding UTF8 -Encoding UTF8).Trim() } else { '' }
+$metaRaw = if (Test-Path $p1.Meta) { (Get-Content -LiteralPath $p1.Meta -Raw -Encoding UTF8).Trim() } else { '' }
 $mf = $metaRaw -split '\|'
 if ($mf.Count -ge 5) {
   Add-Type -TypeDefinition @'
@@ -577,7 +577,7 @@ try {
 $badOut = Join-Path $tmpDir 'bad.txt'
 [void](Start-Detached ('"{0}" -NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File "{1}" -Mod "{2}" -Out "{3}"' -f $psExe, $badPs1, $mod, $badOut))
 [void](Wait-File $badOut 30)
-$badRes = if (Test-Path $badOut) { (Get-Content -LiteralPath $badOut -Raw -Encoding UTF8 -Encoding UTF8).Trim() } else { '' }
+$badRes = if (Test-Path $badOut) { (Get-Content -LiteralPath $badOut -Raw -Encoding UTF8).Trim() } else { '' }
 Check '★ 没有窗口时所有调用都不抛异常（不影响重启）' ($badRes -like 'NO_THROW=True*') $badRes
 
 # ── 收尾 & 安全断言 ─────────────────────────────────────────────────────────

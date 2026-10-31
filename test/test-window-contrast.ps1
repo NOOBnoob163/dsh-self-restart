@@ -115,7 +115,7 @@ function Measure-Case([string]$theme, [string]$mode) {
   [void](Start-Detached ('"{0}" -NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File "{1}" -Mod "{2}" -InfoFile "{3}" -PngFile "{4}" -Mode {5} -Theme {6}' -f $psExe, $app, $mod, $info, $png, $mode, $theme))
   $deadline = (Get-Date).AddSeconds(25)
   while ((Get-Date) -lt $deadline) {
-    if ((Test-Path $info) -and ((Get-Content $info -Raw -Encoding UTF8 -Encoding UTF8) -match 'READY=1')) { break }
+    if ((Test-Path $info) -and ((Get-Content $info -Raw -Encoding UTF8) -match 'READY=1')) { break }
     Start-Sleep -Milliseconds 350
   }
   Start-Sleep -Seconds 5   # 等截图那一步落盘
