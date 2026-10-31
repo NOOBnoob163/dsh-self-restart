@@ -21,3 +21,6 @@ test/already-started
 Thumbs.db
 Desktop.ini
 *.log
+
+# 投稿到官方插件列表用的条目（它属于上游仓库的 PR，不属于本仓库内容）
+.awesome-entry.yml

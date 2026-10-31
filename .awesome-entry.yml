@@ -1,6 +1,0 @@
-url: https://github.com/NOOBnoob163/dsh-self-restart
-name: NOOBnoob163/dsh-self-restart
-category: session
-description:
-  en: 'Lets an agent restart its own host without losing the work in flight: restart_self queues a delayed restart, a detached helper waits until the sessions are idle, then closes and relaunches the app and verifies the port is live again. Several sessions share ONE trip — the restart happens once, then each waiting session is woken separately with its own reason, and each decides independently whether to resume. A session can drop only itself (leave) without calling off everyone else''s restart. Windows desktop only.'
-  zh: '让 Agent 自己重启宿主而不丢手上的活：restart_self 排一次延时重启，脱离进程的助手等会话都空闲后关掉并重新拉起应用、验证端口回来。多个会话共用同一趟车——只重启一次，然后按名单逐个叫醒，每人拿回自己写下的理由，各自决定续不续接；某个会话可以只摘掉自己（leave），不会把别人的重启一起作废。仅支持 Windows 桌面版。'
