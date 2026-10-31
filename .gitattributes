@@ -1,0 +1,6 @@
+# 统一换行：仓库里存 LF，检出到 Windows 时按需转 CRLF。
+# .ps1 必须 CRLF（cmd/PowerShell 对 LF 兼容性差），由下面那条保证。
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.psm1 text eol=crlf

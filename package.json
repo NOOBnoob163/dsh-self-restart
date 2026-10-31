@@ -1,0 +1,64 @@
+{
+  "name": "dsh-self-restart",
+  "version": "1.5.0",
+  "description": "DSH 插件：让 Agent 能「自己重启自己」—— 排一次延时重启，等真正空闲后由脱离进程的助手把 DSH 关掉、重新拉起、验证端口回来；重启完成后把一条唤醒消息直接投进原会话，让它接着干。/ Let a DSH agent restart its own host and resume afterwards.",
+  "private": false,
+  "license": "MIT",
+  "author": "NOOBnoob163",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NOOBnoob163/dsh-self-restart.git"
+  },
+  "homepage": "https://github.com/NOOBnoob163/dsh-self-restart#readme",
+  "bugs": {
+    "url": "https://github.com/NOOBnoob163/dsh-self-restart/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "restart",
+    "self-restart",
+    "windows",
+    "automation"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "os": [
+    "win32"
+  ],
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/",
+    "bin/",
+    "test/",
+    "!test/fixtures/.generated/",
+    "cordis.patch.yml",
+    "deploy.ps1",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node test/test-notice-hook.mjs && node test/selftest.mjs",
+    "deploy": "pwsh -NoProfile -File ./deploy.ps1",
+    "deploy:check": "pwsh -NoProfile -File ./deploy.ps1 -Check"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": "^3.18.1"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.1"
+  }
+}

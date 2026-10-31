@@ -1,0 +1,23 @@
+# 依赖（本插件自身没有运行时依赖，这里只会是本地开发时装的）
+node_modules/
+
+# ⚠️ 必须单独放行这一处：test/fixtures/node_modules/ 下是 14 个**手写的**迷你模块，
+#    用来让自测能在不装 DSH 依赖的情况下跑起来（真正的依赖由宿主提供）。
+#    它们不是"依赖"，是测试资产 —— 被上面那条 node_modules/ 规则挡掉的话，
+#    别人 clone 下来自测会直接 import 失败。
+!test/fixtures/node_modules/
+!test/fixtures/node_modules/**
+
+# 自测生成物：从本机 DSH 的 app.asar 里现取，不入档
+test/fixtures/.generated/
+
+# 状态窗自测写下的关窗记录：每跑一次内容就变，是测试产物不是源码
+already-started
+test/already-started
+
+# 编辑器 / 系统杂项
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+*.log
