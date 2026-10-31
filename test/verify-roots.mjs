@@ -99,7 +99,7 @@ if (listeners === null || listeners.length === 0) {
 //     图标改排在频道前缀**后面**，历史脏标题一次还原）。
 //   ★ 2026-10-25 晚：16 → 17（「重启成功但没叫醒」的 QQ 提醒会误报：改成
 //     三条同时成立才发 —— 真该叫醒 + 那趟真完成 + 没投成）。
-const EXPECTED_IMPL = 18;
+const EXPECTED_IMPL = 19;
 check(`★ 实现版本探针 impl === ${EXPECTED_IMPL}（= 当前这版实现已在跑）`,
   Number(s.impl) === EXPECTED_IMPL,
   Number(s.impl) === EXPECTED_IMPL

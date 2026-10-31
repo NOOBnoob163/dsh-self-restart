@@ -87,6 +87,8 @@ $suites = @(
   @{ Name = 'resume-after-restart';  Kind = 'ps';   File = 'test-resume-after-restart.ps1';  Desc = '重启完自己叫醒自己（判据+逻辑表；2026-10-13 改直接投递）' }
   @{ Name = 'wake-message';          Kind = 'node'; File = 'test-wake-message.mjs';          Desc = '投进会话那条消息的形状（真函数验，防重演当年污染账本）' }
   @{ Name = 'notice-hook';         Kind = 'node'; File = 'test-notice-hook.mjs';         Desc = '★ 外部通知钩子：没配不跑 / 配了真跑 / 失败超时不抛 / 并发只跑一条' }
+  # ★ 2026-11-01 加：「我自己下车」—— 只摘自己、不打掉别人；摘完没人就不发车。
+  @{ Name = 'leave';                Kind = 'node'; File = 'test-leave.mjs';                Desc = '★ 下车只影响自己：车照开 / 摘完没人则不发车 / 不在车上不许动名单' }
   @{ Name = 'history-summary';       Kind = 'node'; File = 'test-history-summary.mjs';        Desc = '重启流水账汇总：中位数/过滤/坏行容错（2026-10-13 新增，真源码+假数据）' }
   @{ Name = 'result-port';           Kind = 'node'; File = 'test-result-port.mjs';            Desc = '★ 重启记录里的 port 必须是真端口（维护记录 对、字段错的守门测试）' }
   @{ Name = 'result-port-live';      Kind = 'ps';   File = 'test-result-port-live.ps1';      Desc = '★ 维护记录 真跑验证：假应用换端口（计划58881→实际58882），port 必须记真的' }

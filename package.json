@@ -1,6 +1,6 @@
 {
   "name": "dsh-self-restart",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "DSH 插件：让 Agent 能「自己重启自己」—— 排一次延时重启，等真正空闲后由脱离进程的助手把 DSH 关掉、重新拉起、验证端口回来；重启完成后把一条唤醒消息直接投进原会话，让它接着干。/ Let a DSH agent restart its own host and resume afterwards.",
   "private": false,
   "license": "MIT",
