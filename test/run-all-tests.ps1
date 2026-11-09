@@ -34,7 +34,7 @@ $psExe = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.e
 # 常用测试清单（顺序按"快 → 慢"排，出错时能更早看到）
 $suites = @(
   # ── ★ 2026-10-22 排队重启那一批（最快，放最前，改坏了 2 秒就知道）──────────
-  @{ Name = 'target-guard';          Kind = 'ps';   File = 'test-target-guard.ps1';          Desc = '★ 要杀的==要拉起的（维护记录 事故的护栏，最重要的一套）' }
+  @{ Name = 'target-guard';          Kind = 'ps';   File = 'test-target-guard.ps1';          Desc = '★ 要杀的==要拉起的（历史事故 事故的护栏，最重要的一套）' }
   # ★ 2026-10-23 加：这一套**跑真脚本**，是唯一能验出"护栏算完有没有人停"的测试。
   #   当年 target-guard 全绿却仍在误杀，就是因为它"照抄一份逻辑来验"，验不到接线。
   @{ Name = 'dry-run-guard';         Kind = 'ps';   File = 'test-dry-run-guard.ps1';         Desc = '★★ 端到端：护栏真的会停手 + 干跑真的不动手（跑真脚本，不抄逻辑）' }
@@ -44,7 +44,7 @@ $suites = @(
   # ★ 2026-10-24 加：「不等了，立刻重启」= 这次"等家务等到没完"事故的出口。
   #   按钮是 WPF 控件，只能开真窗口真点一下才算验过 —— 读源码证明不了它写不写标记。
   @{ Name = 'force-button';          Kind = 'ps';   File = 'test-force-button.ps1';          Desc = '★ 「不等了」：没点亮不写、点亮只写 force 不写 cancel（开真窗口验证）' }
-  # ★ 2026-10-23 下午加：用户报「鼠标放到所有地方都显示那个可移动的效果，能不能像正常窗口」。
+  # ★ 2026-10-23 下午加：窗口不像正常窗口（鼠标放到哪里都显示可移动光标）。
   #   这套**真开窗口、真问系统**（WM_NCHITTEST / 扩展样式），不是读源码猜 ——
   #   因为要验的全是行为：光标分区、任务栏、可拉伸、置顶会自己放下来。
   @{ Name = 'window-like-normal';    Kind = 'ps';   File = 'test-window-like-normal.ps1';    Desc = '★★ 像不像正常窗口：光标分区/任务栏/可拉伸/置顶限时（真问系统）' }
@@ -53,6 +53,14 @@ $suites = @(
   @{ Name = 'relaunch-stop';         Kind = 'ps';   File = 'test-relaunch-stop.ps1';         Desc = '★ 拉起阶段叫停：不是试满次数，而是在下一轮之前停住' }
   @{ Name = 'members';               Kind = 'ps';   File = 'test-members.ps1';               Desc = '名单解析：老计划兼容 / 多人 / 边界（排队重启的地基）' }
   @{ Name = 'queue';                 Kind = 'node'; File = 'test-queue.mjs';                 Desc = '会话来源判据(rpcId) + 标题标记（两项都可能静默出错）' }
+  # ★ 2026-11-09 加：劝停（排队太久劝挡路的本地窗口一起上车）。
+  #   套改动的 bug 全是静默的：该劝的不劝 / 不该劝的劝了 / 反复刷屏 / 文案缺失效声明。
+  #   四条里没有一条会在跑起来时报错，所以必须钉住。
+  @{ Name = 'nudge';                Kind = 'node'; File = 'test-nudge.mjs';                Desc = '★ 劝停判定：阈值/只劝local/车上不劝/同趟只劝一次/文案失效声明' }
+  # ★ 2026-11-10 加：网页设置页的后端通道。它是**唯一一条能从网页改配置的路**，
+  #   写错一处就是安全漏洞（来源不校验 / 能整份合并 → 远程改 dshExe）。
+  #   这四条错法都不会报错，只会让状态慢慢变错，所以逐条钉住。
+  @{ Name = 'settings-bridge';      Kind = 'node'; File = 'test-settings-bridge.mjs';      Desc = '★ 设置页通道：白名单/只认本机/类型校验/前后端路由一致' }
   # ★ 2026-10-23 加：守「回包字段必须都在声明里」。
   #   17:54 那次事故：入队分支多返回 queueLength，宿主整份拒收 →
   #   副作用已发生、调用方却看到"失败" → 它去误取消，把两个人的重启一起打掉。
@@ -76,10 +84,10 @@ $suites = @(
   @{ Name = 'two-phase';             Kind = 'ps';   File = 'test-two-phase.ps1';             Desc = '两段式等待 A/B/C 三场景' }
   @{ Name = 'restart-window';        Kind = 'ps';   File = 'test-restart-window.ps1';        Desc = '状态窗：响应性/拖动/打断/不抢焦点' }
   @{ Name = 'window-contrast';       Kind = 'ps';   File = 'test-window-contrast.ps1';       Desc = '状态窗文字对比度（亮/暗 × 可点/禁用，采样真实像素）' }
-  @{ Name = 'window-offscreen';      Kind = 'ps';   File = 'test-window-offscreen.ps1';      Desc = '状态窗越界：内容撑高后底边不许出屏（2026-10-13 用户报的问题）' }
+  @{ Name = 'window-offscreen';      Kind = 'ps';   File = 'test-window-offscreen.ps1';      Desc = '状态窗越界：内容撑高后底边不许出屏（2026-10-13 实机反馈的问题）' }
   @{ Name = 'window-extreme';        Kind = 'ps';   File = 'test-window-extreme.ps1';        Desc = '状态窗越界（极端）：用实机最长 reason 撑，底边仍不许出屏' }
   @{ Name = 'window-taller';         Kind = 'ps';   File = 'test-window-taller-than-screen.ps1'; Desc = '状态窗：内容比屏幕还高时的降级路径（保住顶部）' }
-  @{ Name = 'window-firstpaint';     Kind = 'ps';   File = 'test-window-firstpaint.ps1';     Desc = '状态窗"不蹦"：首屏内容必须在显示前填好（2026-10-13 用户报的闪烁）' }
+  @{ Name = 'window-firstpaint';     Kind = 'ps';   File = 'test-window-firstpaint.ps1';     Desc = '状态窗"不蹦"：首屏内容必须在显示前填好（2026-10-13 实机反馈的闪烁）' }
   @{ Name = 'main-process-pick';     Kind = 'ps';   File = 'test-main-process-pick.ps1';     Desc = '挑主进程不许挑错（挑错则优雅关闭必失败、界面闪报错）' }
   @{ Name = 'confirm-window';        Kind = 'ps';   File = 'test-confirm-window.ps1';        Desc = '动手前的确认窗：走完才动手；中途「打断」立刻停手' }
   @{ Name = 'watchdog-rescue';       Kind = 'ps';   File = 'test-watchdog-rescue.ps1';       Desc = '保险丝真会救场吗（2026-10-11 新增；此前 24 次真实运行救场 0 次）' }
@@ -90,8 +98,8 @@ $suites = @(
   # ★ 2026-11-01 加：「我自己下车」—— 只摘自己、不打掉别人；摘完没人就不发车。
   @{ Name = 'leave';                Kind = 'node'; File = 'test-leave.mjs';                Desc = '★ 下车只影响自己：车照开 / 摘完没人则不发车 / 不在车上不许动名单' }
   @{ Name = 'history-summary';       Kind = 'node'; File = 'test-history-summary.mjs';        Desc = '重启流水账汇总：中位数/过滤/坏行容错（2026-10-13 新增，真源码+假数据）' }
-  @{ Name = 'result-port';           Kind = 'node'; File = 'test-result-port.mjs';            Desc = '★ 重启记录里的 port 必须是真端口（维护记录 对、字段错的守门测试）' }
-  @{ Name = 'result-port-live';      Kind = 'ps';   File = 'test-result-port-live.ps1';      Desc = '★ 维护记录 真跑验证：假应用换端口（计划58881→实际58882），port 必须记真的' }
+  @{ Name = 'result-port';           Kind = 'node'; File = 'test-result-port.mjs';            Desc = '★ 重启记录里的 port 必须是真端口（历史事故 对、字段错的守门测试）' }
+  @{ Name = 'result-port-live';      Kind = 'ps';   File = 'test-result-port-live.ps1';      Desc = '★ 历史事故 真跑验证：假应用换端口（计划58881→实际58882），port 必须记真的' }
 )
 
 if ($Only) {

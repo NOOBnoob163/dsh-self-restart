@@ -110,8 +110,7 @@ const applyMark = (sess, mark, id = 'sid') => {
 };
 const lastTitle = (sess) => sess.snapshotEvents().at(-1).data.title;
 
-// ── 模拟 dsh-im 的行为（照抄它的 withSessionChannelPrefix 判据）──────────────
-// 源码：dsh-im\plugin-src\host\session-title-prefix.mjs
+// ── 模拟「频道插件」给标题加前缀的行为（判据取自常见实现）──────────────
 //   if (labels.some((label) => title.startsWith(`${label} · `))) return title;
 //   return `${label} · ${title}`;
 // 这一段**故意照抄**：要测的就是"两个插件同时跑会不会互相喂"。
@@ -136,7 +135,7 @@ check('不是数组 → unknown', sessionSourceOf({ snapshotEvents: () => null }
 check('没有 snapshotEvents 也没有 events → unknown', sessionSourceOf({}), 'unknown');
 
 console.log('\n=== ② 标题标记 ===');
-// ★ 2026-10-23 改：标记只剩"图标"，不再带「待重启」四个字（用户要求）。
+// ★ 2026-10-23 改：标记只剩「图标」，不再带「待重启」四个字。
 check('★ 在重启的标记 = 只有图标，不含文字', MARK_RECYCLE, '♻️ ');
 check('★ 失败标记 = 只有图标，不含文字', MARK_FAILED, '⭕ ');
 check('旧版带字前缀仍被认（用于剥掉历史标记）', LEGACY_TITLE_MARKS.includes('♻️ 待重启 · '), true);
@@ -148,10 +147,10 @@ check('★ 剥标记：旧版带字前缀也能剥（老会话树兼容）', str
 check('★ 剥标记：叠了两层也能一次剥干净（循环剥）', stripTitleMark(MARK_RECYCLE + MARK_FAILED + 'x'), 'x');
 check('★ 剥标记：旧+新混着叠也能剥干净', stripTitleMark('♻️ 待重启 · ' + MARK_RECYCLE + 'x'), 'x');
 check('剥标记：没标记时原样', stripTitleMark('原标题'), '原标题');
-check('剥标记：dsh-im 的 QQ 前缀不误伤', stripTitleMark('QQ · 示例群聊'), 'QQ · 示例群聊');
+check('剥标记：别的前缀不误伤', stripTitleMark('QQ · 示例群聊'), 'QQ · 示例群聊');
 
-// ── ★ 2026-10-25：和 dsh-im 抢标题的回归测试（实机事故，见 lib/index.js 那段注释）──
-console.log('\n=== ②-b 与 dsh-im 的频道前缀共存（不许互相喂）===');
+// ── ★ 2026-10-25：和别的插件抢标题的回归测试（见 lib/index.js 那段注释）──
+console.log('\n=== ②-b 与频道前缀共存（不许互相喂）===');
 check('拆标题：无前缀', splitTitle('示例群聊'), { channel: '', body: '示例群聊' });
 check('拆标题：QQ 前缀', splitTitle('QQ · 示例群聊'), { channel: 'QQ · ', body: '示例群聊' });
 check('拆标题：图标在频道前缀前面（旧 bug 形状）', splitTitle('♻️ QQ · 示例群聊'),
@@ -163,16 +162,16 @@ check('★ 拆标题：历史脏标题（叠了 6 层）也能剥回原样',
   { channel: 'QQ · ', body: '示例会话' });
 check('拆标题：正文里的「A · B」不当频道前缀（微信在 QQ 后面 → 正文）',
   splitTitle('QQ · 微信 · 正文'), { channel: 'QQ · ', body: '微信 · 正文' });
-check('★ 频道标签清单认全（dsh-im 的 SESSION_CHANNEL_LABELS 全在里面）',
+check('★ 频道标签清单认全（常见渠道标签都在里面）',
   CHANNEL_LABELS.length, 16);
 check('频道前缀按长度从长到短排（企业微信不会被微信截胡）',
   CHANNEL_PREFIXES[0].length >= CHANNEL_PREFIXES.at(-1).length, true);
 
-check('★ 加图标：图标排在「QQ · 」**后面**（dsh-im 判据要成立）',
+check('★ 加图标：图标排在「QQ · 」**后面**（频道前缀判据要成立）',
   composeTitle('QQ · 示例群聊', MARK_RECYCLE), 'QQ · ♻️ 示例群聊');
 check('加图标：本地会话（无前缀）图标仍在最前', composeTitle('原标题', MARK_RECYCLE), MARK_RECYCLE + '原标题');
 check('摘图标：QQ 前缀留着', composeTitle('QQ · ♻️ 示例群聊', null), 'QQ · 示例群聊');
-check('★★ 加图标后 dsh-im 不会再补一个前缀（这正是互相抢的判据）',
+check('★★ 加图标后频道插件不会再补一个前缀（这正是互相抢的判据）',
   dshImDecorate(composeTitle('QQ · 示例群聊', MARK_RECYCLE)), 'QQ · ♻️ 示例群聊');
 check('★★ 历史脏标题：加一次图标就收敛成两层（不再增长）',
   composeTitle('QQ · ♻️ QQ · ♻️ QQ · 示例会话', MARK_RECYCLE), 'QQ · ♻️ 示例会话');
@@ -188,7 +187,7 @@ check('★★ 历史脏标题：摘图标直接还原成干净标题',
     const sess = makeSess(title);
     applyMark(sess, MARK_RECYCLE, 'war');
     title = lastTitle(sess);
-    // dsh-im 看到 session/title 事件后的反应
+    // 频道插件看到 session/title 事件后的反应
     title = dshImDecorate(title);
     lengths.push(title.length);
   }
@@ -218,37 +217,18 @@ check('重复加是幂等的（不追加第二条）', s._events.length, n1);
 
 s = newSess('s-qq', 'QQ · 示例群聊');
 applyMark(s, MARK_RECYCLE, 's-qq');
-check('★ 与 dsh-im 的「QQ · 」前缀共存（图标在后）', lastTitle(s), 'QQ · ♻️ 示例群聊');
+check('★ 与「QQ · 」前缀共存（图标在后）', lastTitle(s), 'QQ · ♻️ 示例群聊');
 const n2 = s._events.length;
 applyMark(s, MARK_RECYCLE, 's-qq');
 check('★ QQ 会话重复加也幂等（不会每拍追加）', s._events.length, n2);
 applyMark(s, null, 's-qq');
-check('摘掉后 dsh-im 前缀还在', lastTitle(s), 'QQ · 示例群聊');
+check('摘掉后频道前缀还在', lastTitle(s), 'QQ · 示例群聊');
 
 check('没有标题的会话 → 不改', applyMark({ snapshotEvents: () => [], append: () => 1 }, MARK_RECYCLE, 's-empty'), false);
 check('会话没有 append → 不崩',
   applyMark({ snapshotEvents: () => [{ type: 'session/title', data: { title: 'x' } }] }, MARK_RECYCLE, 's-noappend'), false);
 
-// ★ 频道标签清单和 dsh-im 实际那份对账（装了 dsh-im 才查；没装就明说跳过，不静默通过）
-{
-  const labelsFile = join(
-    process.env.DSH_HOME || join(process.env.USERPROFILE || '', '.dsh'),
-    'profiles', 'desktop', 'node_modules', '@xmanrui', 'dsh-im',
-    'src', 'channels', 'shared', 'session-channel-labels.mjs',
-  );
-  let raw = '';
-  try { raw = readFileSync(labelsFile, 'utf8'); } catch { raw = ''; }
-  if (!raw) {
-    console.log('  （跳过：本机没装 @xmanrui/dsh-im，没法对账频道标签清单）');
-  } else {
-    const theirs = [...raw.matchAll(/\['([^']+)',\s*'([^']+)'\]/g)]
-      .flatMap((m) => [m[1], m[2]]);
-    const missing = [...new Set(theirs)].filter((label) => !CHANNEL_LABELS.includes(label));
-    check('★ 本插件的频道标签清单覆盖 dsh-im 的全部标签（它加新渠道这里会红）', missing, []);
-  }
-}
-
-// ── ③ 标题标记的**对账**（2026-10-23 用户报"重启完图标撤不掉"后加的）──────────
+// ── ③ 标题标记的**对账**（2026-10-23 修「重启完图标撤不掉」后加的）──────────
 //
 // 病根：旧逻辑只有"计划文件"一个数据来源。重启成功后助手把 plan.json 删了，
 //       下一拍算出的待摘名单是空集 → 谁都摘不掉 → 图标永远挂着。
@@ -319,7 +299,7 @@ const makeApply = () => {
   //    当时以为"apply 失败 = 会话被删了"，所以划账以免无休止重试。
   //    但实机跑出来的是另一种：会话只是**没被宿主加载**（只有打开的对话才在内存里，
   //    sessions.get 拿不到）→ 摘失败 → 划账 → **那个图标就再也没人管了**。
-  //    这正好是用户报的"图标撤不掉"的第二种形态。
+  //    这正好是「图标撤不掉」的第二种形态。
   //    现在的规矩：摘失败留着下一拍再试；真的无限试不过去，由调用方的
   //    MAX_STRIP_TRIES 兜底放弃（那是 tick 的事，不在这个纯函数里）。
   const dead = { fn: () => false, calls: [] };

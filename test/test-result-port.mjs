@@ -1,4 +1,4 @@
-// test-result-port.mjs —— 「重启记录里的端口，必须写真的那个」（2026-10-24 新增，维护记录）
+// test-result-port.mjs —— 「重启记录里的端口，必须写真的那个」（2026-10-24 新增，历史事故）
 //
 // 【为什么要有这一套】
 //   2026-10-24 14:35 那次重启，last-run.json 长这样：
@@ -77,7 +77,7 @@ function sliceBalanced(src, startIdx) {
 //   QQ 通知函数（约 L205）也有一个同名变量，里面有个 `port = $sendPort`。
 //   第一版直接 `text.indexOf('$payload = ...')` → 切到了**那个**块 →
 //   断言红着说"port 赋的是 $sendPort"，看起来像代码改坏了，其实**是测试找错了地方**。
-//   （本仓的老教训原话："断言要钉'事实在哪'，别钉'我以为它在哪'"。）
+//   （本仓的老教训。）
 //   ⇒ 现在先定位 `function Save-Result`，**从它之后**再找 $payload。
 const saveResultAt = text.indexOf('function Save-Result');
 check('找得到 function Save-Result', saveResultAt >= 0);
@@ -102,7 +102,7 @@ const rowBlock = rowAt >= 0 ? sliceBalanced(text, rowAt) : null;
 check('$row 块能完整切出来', !!rowBlock && rowBlock.length > 50,
   rowBlock ? `${rowBlock.length} 字符` : '切不出来');
 const rowPort = rowBlock ? rowBlock.match(/^\s*port\s*=\s*(.+)$/m) : null;
-check('★ 流水账 $row 里有 port 字段（维护记录 前压根没有）', !!rowPort,
+check('★ 流水账 $row 里有 port 字段（历史事故 前压根没有）', !!rowPort,
   rowPort ? rowPort[0].trim() : '没有 —— 流水账会继续缺端口');
 check('★ 流水账的 port 与 last-run 的 port 同源（都是 $script:ActualPort）',
   !!rowPort && /\$script:ActualPort/.test(rowPort[1]),

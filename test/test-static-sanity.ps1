@@ -205,9 +205,9 @@ foreach ($st in $used) {
 }
 Check '★ 状态窗覆盖所有阶段文案' ($missing.Count -eq 0) $(if ($missing.Count) { '缺：' + ($missing -join ', ') } else { "$($used.Count) 个阶段都在" })
 
-# ── ★★ ④-b 「像一个正常的窗口」（2026-10-23 下午，用户报的）──────────────────
+# ── ★★ ④-b 「像一个正常的窗口」（2026-10-23 下午，实机反馈的）──────────────────
 #
-# 【用户原话】「这东西不能更像一个正常的窗口吗？它现在还就是鼠标放到所有地方
+# 【需求】「这东西不能更像一个正常的窗口吗？它现在还就是鼠标放到所有地方
 #   都显示那个可移动的效果，就是它不能像一个正常的窗口一样吗？」
 #
 # 【这一组钉什么】四条改动，每条都是"读代码能看对、跑起来才看得出"的东西：
@@ -231,7 +231,7 @@ Check '★ 任务栏里能找到它（ShowInTaskbar = true）' ($winText -match 
 Check '★ 边框可拉伸（ResizeMode = CanResize）' ($winText -match 'ResizeMode\s*=\s*ResizeMode\.CanResize')
 Check '★ 置顶是**限时**的（前 N 秒置顶，之后放下来）' `
   ($winText -match '_topmostTimer' -and $winText -match '_win\.Topmost\s*=\s*false')
-Check '★ 置顶放下来的秒数是用户定的 10 秒' ($winText -match 'TopmostSeconds\s*=\s*10')
+Check '★ 置顶放下来的秒数是约定的 10 秒' ($winText -match 'TopmostSeconds\s*=\s*10')
 Check '★ Alt+F4 / 系统关闭也写取消标记（Closing 里写 _cancelFile）' `
   ($winText -match '_win\.Closing' -and $winText -match 'File\.WriteAllText\(')
 Check '★ 阴影留了边距（以前被窗口矩形硬裁，看着是硬切边）' ($winText -match '_card\.Margin\s*=\s*new\s+Thickness\(ShadowPad\)')
@@ -248,7 +248,7 @@ Check '★ 动手前"拉得起来"那道闸还在（第 ④ 步）' ($helperText
 Check '★ 状态窗失败不许拦路（每一步都包了容错）' (($winText -match 'catch') -and ($helperText -match 'function Close-RestartWindowSafe'))
 
 # ── ⑤-b ★ 2026-10-23：失败提示**不许**回到"全局广播"──────────────────────────
-# 用户原话：「失败重启的广播你修了吗？所有对话都在跟我提重启失败的事儿」
+#
 #
 # 旧做法把提示挂在 systemPrompt 上（ctx.inject(['systemPrompt']) → sp.context），
 # 那是**这个 profile 里每个会话**都会读到的东西 → 写文档的对话也来复述一遍。

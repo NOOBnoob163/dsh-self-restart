@@ -173,7 +173,7 @@ Check '★ 空跑回话也带叫醒口径（干跑=陌生人的第一手体检�
 
 Write-Host ''
 Write-Host '=== ④ 落地形态：不能新建"接力棒文件"（使用者 2026-10-12 明确否掉）===' -ForegroundColor Cyan
-# 原话："我不太想要这个接力棒文件，没有更好的方案吗？"
+#
 # 所以：不许出现 relay.json 之类的额外状态文件。
 Check '没有新建接力棒文件（复用 last-run.json 的字段）' (-not ($libText -match "relayPath|relay\.json|relayFile"))
 Check '没有 resume_prompt 参数的残留' (-not ($libText -match 'resume_prompt'))
@@ -310,7 +310,7 @@ Check '空文件 / 没有 finishedAt → 不该叫醒' (-not (ShouldWake @{outco
 Check '未来时间戳（离奇数据）→ 不该叫醒' (-not (ShouldWake (Make-Variant $good @{finishedAt=$T0.AddHours(2).ToString('o')}) $T0))
 
 Write-Host '  --- ★ 本次重启自己选"要不要续接"（2026-10-13 新增）---' -ForegroundColor DarkGray
-# 背景（用户原话）："让在干活的模型自己选续不续接" ——
+# 背景："让在干活的模型自己选续不续接" ——
 #   多数情况要续接，但**收尾型重启**不该叫醒（活干完了，叫起来只会自己跟自己说话）。
 Check '★ resume=true → 照常叫醒' (ShouldWake (Make-Variant $good @{resume=$true}) $T0)
 Check '★ resume=false → 不叫醒（收尾型重启）' (-not (ShouldWake (Make-Variant $good @{resume=$false}) $T0))
@@ -350,7 +350,7 @@ Check '等待文案说清"安静了就立刻动手"' ($winText -match '安静了
 Check '等待文案用「已经等了」（过去时，不是倒数）' ($winText -match '已经等了 \{0:N0\} 秒')
 
 Write-Host ''
-Write-Host '=== ⑦ 工具说明：delay_seconds 一律填 0（2026-10-13 用户定死）===' -ForegroundColor Cyan
+Write-Host '=== ⑦ 工具说明：delay_seconds 一律填 0（2026-10-13 约定死）===' -ForegroundColor Cyan
 # 背景：这条规则被推翻过两次。
 #   2026-10-12 我设了 120 秒被质问 → 当时改成"按回复长度填"；
 #   2026-10-13 我照那张表又填了 40 秒 → 用户识破：
@@ -367,8 +367,8 @@ Check '★ delay_seconds 说明里要求"放在这一轮最后一个动作"' `
 Check 'reason 说明里提到它会出现在唤醒提醒里' ($libText -match 'handed back to you in the wake-up reminder')
 
 Write-Host ''
-Write-Host '=== ⑦-c max_wait_minutes 三层默认值必须都是 0「一直等」（2026-10-24 用户定）===' -ForegroundColor Cyan
-# 背景：用户 问「现在已经有我这个手动关闭档了，那 30 分钟的硬上线是不是可以不设了？」
+Write-Host '=== ⑦-c max_wait_minutes 三层默认值必须都是 0「一直等」（2026-10-24 约定）===' -ForegroundColor Cyan
+# 背景：当时的疑问是「30 分钟的硬上线是不是可以不设了」。
 #   查下去发现真正的坑不是那 30 分钟（那是显式传的），而是**三层默认值不自洽**：
 #     · schema        默认 0（一直等）✅
 #     · lib 兜底      `: 5`  ← 配置读不出来时悄悄变成"最多等 5 分钟"

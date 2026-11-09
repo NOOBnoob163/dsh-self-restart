@@ -1,4 +1,4 @@
-﻿# 验证 维护记录 修复：真跑一次"关掉 → 拉起来"，看 last-run.json / history.jsonl 记的是不是真端口
+﻿# 验证 历史事故 修复：真跑一次"关掉 → 拉起来"，看 last-run.json / history.jsonl 记的是不是真端口
 #
 # 【为什么必须真跑，不能只靠静态断言】
 #   这次的 bug 就是"同一次调用里用了两个变量"。静态断言只能证明"代码里写着 ActualPort"，
@@ -99,7 +99,7 @@ $plan = [ordered]@{
   planId = 'restart-portlive-test'
   createdAt = (Get-Date).ToString('o')
   scheduleAt = (Get-Date).ToString('o')
-  reason = '维护记录 真跑验证（假目标）：确认 port 字段记的是真端口'
+  reason = '历史事故 真跑验证（假目标）：确认 port 字段记的是真端口'
   port = $planPort
   dshExe = $fakeExe
   dshWorkDir = $work
@@ -153,7 +153,7 @@ if (Test-Path $histFile) {
   $lines = @(Get-Content $histFile -Encoding UTF8 | Where-Object { $_.Trim() })
   Check '流水账写出了 1 行' ($lines.Count -ge 1) "$($lines.Count) 行"
   $row = $lines[-1] | ConvertFrom-Json
-  Check '★ history.jsonl 里**有** port 字段（维护记录 前压根没有）' `
+  Check '★ history.jsonl 里**有** port 字段（历史事故 前压根没有）' `
     ($null -ne $row.PSObject.Properties['port']) "字段：$(($row.PSObject.Properties.Name) -join ',')"
   if ($null -ne $row.PSObject.Properties['port']) {
     Check '★ history 的 port 也是真端口' ([int]$row.port -eq $realPort) "port=$($row.port)  期望=$realPort"
